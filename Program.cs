@@ -26,29 +26,23 @@ Console.CancelKeyPress += (_, _) =>
     SteamProvider.Unregister();
 };
 
+OsuProvider.Instence.OnBeatmapChanged += _ => UpdatePresense();
+OsuProvider.Instence.OnStatusChanged += (_, _) => UpdatePresense();
+
 long lastTimestamp = 0;
-const int updateRate = 1; // seconds between update
-string lastPresence = string.Empty;
 SpinWait.SpinUntil(() =>
 {
     SteamProvider.Update();
-    
-    long currentTimestamp = DateTime.UtcNow.Ticks / (10000000 * updateRate);
-
-    if (OsuProvider.Status is OsuListenerManager.OsuStatus.Unkonwn or OsuListenerManager.OsuStatus.NoFoundProcess) return false;
-
-    if (currentTimestamp == lastTimestamp) return false;
-    
-    string info = OsuProvider.GetPresenceString();
-
-    if (lastPresence == info) return false;
-    
-    SteamProvider.SetStatus(info);
-    Logger.Log("Updating: " + info);
-    lastPresence = info;
-
     return false;
 });
 
 OsuProvider.Stop();
 SteamProvider.Unregister();
+
+void UpdatePresense()
+{
+    string info = OsuProvider.GetPresenceString();
+    
+    SteamProvider.SetStatus(info);
+    Logger.Log("Updating: " + info);
+}
