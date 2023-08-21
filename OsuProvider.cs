@@ -1,5 +1,4 @@
-﻿using System.Diagnostics;
-using OsuRTDataProvider.BeatmapInfo;
+﻿using OsuRTDataProvider.BeatmapInfo;
 using OsuRTDataProvider.Listen;
 using OsuRTDataProvider.Mods;
 using static OsuRTDataProvider.Listen.OsuListenerManager;
@@ -42,8 +41,6 @@ public static class OsuProvider
         string title = useUnicode2 ? Beatmap.TitleUnicode : Beatmap.Title;
 
         string beatmapString = $"{artist} - {title}";
-
-        HasUpdate = false;
         
         switch (Status)
         {
@@ -94,10 +91,6 @@ public static class OsuProvider
         Instence.OnModsChanged += modsInfo => PlayMods = modsInfo.Mod;
         Instence.OnBeatmapChanged += beatmap => Beatmap = beatmap;
         Instence.OnStatusChanged += (_, current) => Status = current;
-
-        Instence.OnModsChanged += _ => HasUpdate = true;
-        Instence.OnBeatmapChanged += _ => HasUpdate = true;
-        Instence.OnStatusChanged += (_, _) => HasUpdate = true;
         
         Instence.Start();
     }
@@ -113,6 +106,4 @@ public static class OsuProvider
     public static Beatmap Beatmap = Beatmap.Empty;
 
     public static bool UseUnicode = true;
-
-    public static bool HasUpdate = true;
 }

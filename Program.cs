@@ -41,10 +41,11 @@ SpinWait.SpinUntil(() =>
     
     string info = OsuProvider.GetPresenceString();
 
-    if (lastPresence == info && !OsuProvider.HasUpdate) return false;
+    if (lastPresence == info) return false;
     
     SteamProvider.SetStatus(info);
     Logger.Log("Updating: " + info);
+    lastPresence = info;
 
     return false;
 });
