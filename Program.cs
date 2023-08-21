@@ -28,22 +28,24 @@ Console.CancelKeyPress += (_, _) =>
 
 long lastTimestamp = 0;
 const int updateRate = 1; // seconds between update
-
+string lastPresence = string.Empty;
 SpinWait.SpinUntil(() =>
 {
     SteamProvider.Update();
     
     long currentTimestamp = DateTime.UtcNow.Ticks / (10000000 * updateRate);
 
-    if (currentTimestamp == lastTimestamp || !OsuProvider.HasUpdate) return false;
-
     if (OsuProvider.Status is OsuListenerManager.OsuStatus.Unkonwn or OsuListenerManager.OsuStatus.NoFoundProcess) return false;
+
+    if (currentTimestamp == lastTimestamp) return false;
     
     string info = OsuProvider.GetPresenceString();
 
+    if (lastPresence == info && !OsuProvider.HasUpdate) return false;
+    
     SteamProvider.SetStatus(info);
     Logger.Log("Updating: " + info);
-    
+
     return false;
 });
 

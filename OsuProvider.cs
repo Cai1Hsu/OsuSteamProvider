@@ -36,7 +36,12 @@ public static class OsuProvider
                 break;
         }
 
-        string beatmapString = UseUnicode ? $"{Beatmap.ArtistUnicode} - {Beatmap.TitleUnicode}" : $"{Beatmap.Artist} - {Beatmap.Title}";
+        bool useUnicode1 = UseUnicode && !string.IsNullOrEmpty(Beatmap.ArtistUnicode);
+        bool useUnicode2 = UseUnicode && !string.IsNullOrEmpty(Beatmap.TitleUnicode);
+        string artist = useUnicode1 ? Beatmap.ArtistUnicode : Beatmap.Artist;
+        string title = useUnicode2 ? Beatmap.TitleUnicode : Beatmap.Title;
+
+        string beatmapString = $"{artist} - {title}";
 
         HasUpdate = false;
         
@@ -44,7 +49,12 @@ public static class OsuProvider
         {
             case OsuStatus.Rank:
             case OsuStatus.Playing:
-                return $"{prefix} {beatmapString}[{Beatmap.Difficulty}] {GetModsString()}";
+                string mods = GetModsString();
+                
+                if (mods.ToLower().Contains("auto")) prefix = "Watching";
+                if (mods.ToLower().Contains("error")) mods = string.Empty;
+                
+                return $"{prefix} {beatmapString}[{Beatmap.Difficulty}] {mods}";
             
             default:
                 return $"{prefix} {beatmapString}";
@@ -59,7 +69,7 @@ public static class OsuProvider
 
         if (!modsInfo.HasMod(PlayMods)) return "NM";
 
-        return modsInfo.ToString();
+        return modsInfo.ShortName;
     }
 
     public static void RegisterDebug()
